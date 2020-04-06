@@ -107,7 +107,7 @@ def date_start(start):
 
     selected_data = session.query(*sel).filter(Measurement.date >= start).all()
 
-    selected_data = [row for row in selected_data]
+    selected_data = list(selected_data[0])
 
     return jsonify(selected_data)
 
@@ -123,7 +123,7 @@ def date_range(start, end):
 
     selected_data2 = session.query(*sel).filter(Measurement.date >= start, Measurement.date <= end).all()
 
-    selected_data2 = [row for row in selected_data2]
+    selected_data2 = list(selected_data2[0])
 
     return jsonify(selected_data2)
 
