@@ -29,6 +29,7 @@ Station = Base.classes.station
 # Create our session (link) from Python to the DB
 session = Session(engine)
 
+
 @app.route("/")
 def homepage():
     
@@ -67,6 +68,33 @@ def stations():
     station_names = [row[0] for row in station_names]
 
     return jsonify(station_names)
+
+@app.route("/api/v1.0/tobs")
+def tobs():
+
+    # Choose the station with the highest number of temperature observations.
+    tobs_obs_count = session.query(Measurement.station, func.count(Measurement.tobs).\
+                label('Number_of_Obs')).group_by(Measurement.station).\
+                order_by(text("Number_of_Obs DESC")).first()
+    station_max_obs = tobs_obs_count[0]
+
+    # Query the last 12 months of temperature observation data for this station
+
+    # Calculate the date 1 year ago from the last data point in the database
+    latest_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()[0]
+
+    earliest_date =  dt.datetime.strptime(latest_date, "%Y-%m-%d") - dt.timedelta(days=365)
+
+    earliest_date = earliest_date.strftime("%Y-%m-%d")
+
+    temp_data = session.query(Measurement.tobs).\
+                filter(Measurement.date <= latest_date,\
+                Measurement.date >= earliest_date,
+                Measurement.station == station_max_obs).all()
+
+    temp_data = [temp[0] for temp in temp_data]
+
+    return jsonify(temp_data)
 
     
 if __name__ == "__main__":
