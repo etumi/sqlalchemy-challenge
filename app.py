@@ -96,6 +96,20 @@ def tobs():
 
     return jsonify(temp_data)
 
+@app.route("/api/v1.0/<start>")
+def date_range(start):
+
+    #most_active_station = most_active_station[0]
+    sel = [
+        func.min(Measurement.tobs),\
+        func.max(Measurement.tobs),\
+        func.avg(Measurement.tobs)
+        ]
+
+    selected_data = session.query(*sel).filter(Measurement.date == start).all()
+
+    return jsonify(selected_data)
+
     
 if __name__ == "__main__":
     app.run(debug=True)
