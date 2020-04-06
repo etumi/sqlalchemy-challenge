@@ -97,18 +97,35 @@ def tobs():
     return jsonify(temp_data)
 
 @app.route("/api/v1.0/<start>")
-def date_range(start):
+def date_start(start):
 
     #most_active_station = most_active_station[0]
-    sel = [
-        func.min(Measurement.tobs),\
+    sel = [func.min(Measurement.tobs),\
         func.max(Measurement.tobs),\
         func.avg(Measurement.tobs)
         ]
 
-    selected_data = session.query(*sel).filter(Measurement.date == start).all()
+    selected_data = session.query(*sel).filter(Measurement.date >= start).all()
+
+    selected_data = [row for row in selected_data]
 
     return jsonify(selected_data)
+
+
+@app.route("/api/v1.0/<start>/<end>")
+def date_range(start, end):
+
+    #most_active_station = most_active_station[0]
+    sel = [func.min(Measurement.tobs),\
+        func.max(Measurement.tobs),\
+        func.avg(Measurement.tobs)
+        ]
+
+    selected_data2 = session.query(*sel).filter(Measurement.date >= start, Measurement.date <= end).all()
+
+    selected_data2 = [row for row in selected_data2]
+
+    return jsonify(selected_data2)
 
     
 if __name__ == "__main__":
