@@ -51,6 +51,7 @@ def precipitation():
     earliest_date =  dt.datetime.strptime(latest_date, "%Y-%m-%d") - dt.timedelta(days=365)
 
     earliest_date = earliest_date.strftime("%Y-%m-%d")
+    
     # Perform a query to retrieve the data and precipitation scores
     last_12_months = session.query(Measurement.date, Measurement.prcp).\
                     filter(Measurement.date <= latest_date,\
@@ -78,8 +79,6 @@ def tobs():
                 order_by(text("Number_of_Obs DESC")).first()
     station_max_obs = tobs_obs_count[0]
 
-    # Query the last 12 months of temperature observation data for this station
-
     # Calculate the date 1 year ago from the last data point in the database
     latest_date = session.query(Measurement.date).order_by(Measurement.date.desc()).first()[0]
 
@@ -87,6 +86,7 @@ def tobs():
 
     earliest_date = earliest_date.strftime("%Y-%m-%d")
 
+    # Query the last 12 months of temperature observation data for this station
     temp_data = session.query(Measurement.tobs).\
                 filter(Measurement.date <= latest_date,\
                 Measurement.date >= earliest_date,
@@ -99,7 +99,6 @@ def tobs():
 @app.route("/api/v1.0/<start>")
 def date_start(start):
 
-    #most_active_station = most_active_station[0]
     sel = [func.min(Measurement.tobs),\
         func.max(Measurement.tobs),\
         func.avg(Measurement.tobs)
@@ -115,7 +114,6 @@ def date_start(start):
 @app.route("/api/v1.0/<start>/<end>")
 def date_range(start, end):
 
-    #most_active_station = most_active_station[0]
     sel = [func.min(Measurement.tobs),\
         func.max(Measurement.tobs),\
         func.avg(Measurement.tobs)
