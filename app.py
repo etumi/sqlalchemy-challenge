@@ -38,8 +38,8 @@ def homepage():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/start<br/>"
-        f"/api/v1.0/start/end"
+        f"/api/v1.0/start/2017-01-31<br/>"
+        f"/api/v1.0/start/2016-01-01/end/2017-01-01"
     )
 
 @app.route("/api/v1.0/precipitation")
@@ -51,7 +51,7 @@ def precipitation():
     earliest_date =  dt.datetime.strptime(latest_date, "%Y-%m-%d") - dt.timedelta(days=365)
 
     earliest_date = earliest_date.strftime("%Y-%m-%d")
-    
+
     # Perform a query to retrieve the data and precipitation scores
     last_12_months = session.query(Measurement.date, Measurement.prcp).\
                     filter(Measurement.date <= latest_date,\
@@ -96,7 +96,7 @@ def tobs():
 
     return jsonify(temp_data)
 
-@app.route("/api/v1.0/<start>")
+@app.route("/api/v1.0/start/<start>")
 def date_start(start):
 
     sel = [func.min(Measurement.tobs),\
@@ -111,7 +111,7 @@ def date_start(start):
     return jsonify(selected_data)
 
 
-@app.route("/api/v1.0/<start>/<end>")
+@app.route("/api/v1.0/start/<start>/end/<end>")
 def date_range(start, end):
 
     sel = [func.min(Measurement.tobs),\
